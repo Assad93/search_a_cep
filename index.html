@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <title>Search a CEP!</title>
+    <style>
+        body {
+            width: 500px;
+            height: 325px;
+            background-image: url('./imagens/background-2.jpg');
+        }
+    </style>
+</head>
+<body>
+    <h1 class="text-center text-white">Search a CEP</h1>
+    <div class="container mt-2">
+        <div class="form-group">
+            <label for="logradouro" class="text-white">Logradouro: </label>
+            <input type="text" id="logradouro" class="form-control" placeholder="Ex: Avenida Copacabana">
+        </div>
+        <div class="form-row">
+            <div class="form-group col-2">
+                <label for="uf" class="text-white">Estado: </label>
+                <select id="uf" class="form-control custom-select">
+                    <option value="" disabled selected>UF</option>
+                </select>
+            </div>
+            <div class="form-group col-10">
+                <label for="cidade" class="text-white">Cidade: </label>
+                <input type="text" id="cidade" class="form-control mb-1" placeholder="Ex: Rio de Janeiro">
+            </div>
+        </div>
+        <button id="btn" class="btn btn-info btn-lg btn-block mt-2">Busque pelo CEP</button>
+        <hr>
+        <input class="form-control mb-2" id="resultado" type="text" placeholder="CEP" readonly>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

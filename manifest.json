@@ -1,0 +1,9 @@
+{
+    "name" : "SEARCH_A_CEP",
+    "version" : "1.0",
+    "description" : "Ache um CEP através do endereço",
+    "browser_action" : {
+        "default_popup" : "index.html"
+    },
+    "manifest_version" : 2
+}
