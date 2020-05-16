@@ -1,18 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
-    //Lista com os estados
-    const ufList = ["AC", "AL", "AP", "AM", "BA", "CE",
-                    "DF", "ES", "GO", "MA", "MT", "MS",
-                    "MG", "PA", "PB", "PR", "PE", "PI",
-                    "RJ", "RN", "RS", "RO", "RR", "SC",
-                    "SP", "SE", "TO"
+    //Lista com os estados e os respectivos ID´s do IBGE
+    const ufList = [{"id" : 12 , "sigla" : "AC"}, {"id" : 27 , "sigla" : "AL"}, {"id" : 16 , "sigla" : "AP"}, 
+                    {"id" : 13 , "sigla" : "AM"}, {"id" : 29 , "sigla" : "BA"}, {"id" : 23 , "sigla" : "CE"},
+                    {"id" : 53 , "sigla" : "DF"}, {"id" : 32 , "sigla" : "ES"}, {"id" : 52 , "sigla" : "GO"},
+                    {"id" : 21 , "sigla" : "MA"}, {"id" : 51 , "sigla" : "MT"}, {"id" : 50 , "sigla" : "MS"},
+                    {"id" : 31 , "sigla" : "MG"}, {"id" : 15 , "sigla" : "PA"}, {"id" : 25 , "sigla" : "PB"},
+                    {"id" : 41 , "sigla" : "PR"}, {"id" : 26 , "sigla" : "PE"}, {"id" : 22 , "sigla" : "PI"},
+                    {"id" : 33 , "sigla" : "RJ"}, {"id" : 24 , "sigla" : "RN"}, {"id" : 43 , "sigla" : "RS"},
+                    {"id" : 11 , "sigla" : "RO"}, {"id" : 14 , "sigla" : "RR"}, {"id" : 42 , "sigla" : "SC"},
+                    {"id" : 35 , "sigla" : "SP"}, {"id" : 28 , "sigla" : "SE"}, {"id" : 17 , "sigla" : "TO"}
                    ]
     
-                   
+    //capturando o select de UF´s               
     const ufSelect = document.getElementById("uf");
-
+    //Preenchendo o select de UF´s               
     ufList.forEach((uf) => {
-        option = new Option(uf, uf.toLowerCase());
+        option = new Option(uf.sigla, uf.id);
         ufSelect.options[ufSelect.options.length] = option;
+    });
+
+    //capturando o select de Cidades
+    const cidadesSelect = document.querySelector("#cidade");
+    //Preenchendo o select de Cidades
+    document.querySelector("#uf").addEventListener('blur', function() {
+        let idUF = document.querySelector('#uf').value;
+        console.log(idUF);
+        listaCidadesPorUF(idUF);
+        // continue, tornar o select dinamico
     });
 
     document.querySelector('#btn').addEventListener('click', function() {
@@ -21,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let logradouro = document.querySelector('#logradouro').value;
 
         document.querySelector('#resultado').value = buscaCEP(uf, cidade, logradouro);
-    })
+    });
 
     function buscaCEP(uf,cidade,logradouro) {
         let url = "https://viacep.com.br/ws/" + uf + "/"+ cidade +"/" + logradouro + "/json/"; 
@@ -45,6 +59,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
         xmlHttp.send();
     }
-})
 
-//continue no select
+    function listaCidadesPorUF(idUF) {
+        let url = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/"+ idUF +"/municipios";
+        let xmlHttp = new XMLHttpRequest();
+        xmlHttp.open('GET', url);
+        xmlHttp.onreadystatechange = () => {
+            if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                let txtMunicipios = xmlHttp.responseText;
+                let jsonMunicipios = JSON.parse(txtMunicipios);
+                console.log(jsonMunicipios);
+                preencheOSelectComAsCidades(jsonMunicipios);                    
+            }
+        }
+        xmlHttp.send();
+    }
+
+    function preencheOSelectComAsCidades(municipios) {
+        let municipiosList = municipios;
+        let municipiosSelect = document.querySelector('#cidade');
+
+        municipiosList.forEach((municipio) => {
+            option = new Option(municipio.nome, municipio.nome.toLowerCase());
+            municipiosSelect.options[municipiosSelect.options.length] = option;
+        });
+    }
+})

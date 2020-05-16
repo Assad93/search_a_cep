@@ -23,12 +23,14 @@
             <div class="form-group col-2">
                 <label for="uf" class="text-white">Estado: </label>
                 <select id="uf" class="form-control custom-select">
-                    <option value="" disabled selected>UF</option>
+                    <option value="#" disabled selected>UF</option>
                 </select>
             </div>
             <div class="form-group col-10">
                 <label for="cidade" class="text-white">Cidade: </label>
-                <input type="text" id="cidade" class="form-control mb-1" placeholder="Ex: Rio de Janeiro">
+                <select id="cidade" class="form-control custom-select mb-1">
+                    <option value="#" disabled selected>Selecione uma cidade</option>
+                </select>
             </div>
         </div>
         <button id="btn" class="btn btn-info btn-lg btn-block mt-2">Busque pelo CEP</button>
