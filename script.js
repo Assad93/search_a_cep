@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let idUF = document.querySelector('#uf').value;
         console.log(idUF);
         listaCidadesPorUF(idUF);
-        // continue, tornar o select dinamico
     });
 
     document.querySelector('#btn').addEventListener('click', function() {
@@ -69,19 +68,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 let txtMunicipios = xmlHttp.responseText;
                 let jsonMunicipios = JSON.parse(txtMunicipios);
                 console.log(jsonMunicipios);
-                preencheOSelectComAsCidades(jsonMunicipios);                    
+                let municipiosList = jsonMunicipios;
+                let municipiosSelect = document.querySelector('#cidade');
+        
+                if (!municipiosSelect.options[1]) {
+                    municipiosList.forEach((municipio) => {
+                        option = new Option(municipio.nome, municipio.nome.toLowerCase());
+                        municipiosSelect.options[municipiosSelect.options.length] = option;
+                    });
+                } else {                     
+                    municipiosSelect.innerHTML = "";
+                    municipiosList.forEach((municipio) => {
+                        option = new Option(municipio.nome, municipio.nome.toLowerCase());
+                        municipiosSelect.options[municipiosSelect.options.length] = option;
+                    });
+                } //continue
+                
+                                   
             }
         }
         xmlHttp.send();
     }
 
-    function preencheOSelectComAsCidades(municipios) {
-        let municipiosList = municipios;
-        let municipiosSelect = document.querySelector('#cidade');
-
-        municipiosList.forEach((municipio) => {
-            option = new Option(municipio.nome, municipio.nome.toLowerCase());
-            municipiosSelect.options[municipiosSelect.options.length] = option;
-        });
-    }
 })
