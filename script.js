@@ -22,35 +22,81 @@ document.addEventListener('DOMContentLoaded', function() {
     //capturando o select de Cidades
     const cidadesSelect = document.querySelector("#cidade");
     //Preenchendo o select de Cidades
-    document.querySelector("#uf").addEventListener('blur', function() {
+    document.querySelector("#uf").addEventListener('change', function() {
         let idUF = document.querySelector('#uf').value;
-        console.log(idUF);
         listaCidadesPorUF(idUF);
     });
 
     document.querySelector('#btn').addEventListener('click', function() {
-        let uf = document.querySelector('#uf').value;
+        let ufValue = document.querySelector('#uf').value;
         let cidade = document.querySelector('#cidade').value;
         let logradouro = document.querySelector('#logradouro').value;
-
-        document.querySelector('#resultado').value = buscaCEP(uf, cidade, logradouro);
+        document.querySelector('#mensagem').innerHTML = "";
+        if (ufValue == '#' || logradouro == '' || cidade == '#') {
+            let alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.role = 'alert';
+            alert.innerHTML = 'Preencha os três campos para realizar a pesquisa! :-)';
+            document.querySelector('#mensagem').appendChild(alert);
+        } else {
+            ufList.forEach(uf => {
+                if(uf.id == ufValue) sigla = uf.sigla; 
+            });
+    
+            buscaCEP(sigla, cidade, logradouro);
+        }  
     });
 
     function buscaCEP(uf,cidade,logradouro) {
+        if (logradouro.length < 3) {
+            let msgWarning = document.createElement('div');
+                msgWarning.className = 'bg-warning pt-2 text-white d-flex justify-content-center mb-2';
+                msgWarning.innerHTML = '<h5> Para consultar o CEP insira 3 ou mais caracteres!</h5>';
+                document.querySelector('#containerDinamico').appendChild(msgWarning);
+                finalizaConsulta();
+        }
         let url = "https://viacep.com.br/ws/" + uf + "/"+ cidade +"/" + logradouro + "/json/"; 
         let xmlHttp = new XMLHttpRequest();
         xmlHttp.open('GET', url);
-        //console.log(xmlHttp);
+        console.log(url);
+        console.log(xmlHttp);
         xmlHttp.onreadystatechange = () => {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 let txtEndereco = xmlHttp.responseText;
                 let jsonEndereco = JSON.parse(txtEndereco);
-                //console.log(jsonEndereco);
-                if (jsonEndereco.length > 1) { //continue
-                    document.querySelector('#resultado').value = "Mais de um registro encontrado!";
-                    alert('Mais de um registro encontrado! Coloque o nome completo do logradouro e da cidade, para evitar conflitos.');
+                if (jsonEndereco.length > 1) { 
+                    let msgSelect = document.createElement('div');
+                    msgSelect.className = 'bg-success pt-2 text-white d-flex justify-content-center mb-2';
+                    msgSelect.innerHTML = '<h5> Selecione uma opção de endereço abaixo: </h5>';
+                    let novoSelect = document.createElement('select');
+                    novoSelect.id = 'optsendereco';
+                    novoSelect.className = 'form-control mb-2 custom-select';
+                    document.querySelector('#containerDinamico').appendChild(msgSelect);
+                    document.querySelector('#containerDinamico').appendChild(novoSelect);
+                    jsonEndereco.forEach(endereco => {
+                        let opt = endereco.logradouro + " " + endereco.complemento;
+                        option = new Option(opt, endereco.cep);
+                        novoSelect.options[novoSelect.options.length] = option;
+                    });
+
+                    novoSelect.addEventListener('change', function() {
+                        exibirCep(novoSelect.value);
+                        finalizaConsulta();
+                        novoSelect.setAttribute('disabled', 'disabled');
+                    });
+                
                 }else {
-                    document.querySelector('#resultado').value = jsonEndereco[0].cep; 
+                    if(jsonEndereco.length == 0) {
+                        let msgWarning = document.createElement('div');
+                        msgWarning.className = 'bg-warning pt-2 text-white d-flex justify-content-center mb-2';
+                        msgWarning.innerHTML = '<h5> CEP não encontrado, verifique se você digitou um endereço válido!</h5>';
+                        document.querySelector('#containerDinamico').appendChild(msgWarning);
+                        finalizaConsulta();
+                    }else {
+                        exibirCep(jsonEndereco[0].cep);
+                        finalizaConsulta();
+                    }
+                    
                 }
                 
             }
@@ -82,12 +128,54 @@ document.addEventListener('DOMContentLoaded', function() {
                         option = new Option(municipio.nome, municipio.nome.toLowerCase());
                         municipiosSelect.options[municipiosSelect.options.length] = option;
                     });
-                } //continue
+                } 
                 
                                    
             }
         }
         xmlHttp.send();
     }
+    
+    function exibirCep(cep) {
+        let btnCopiar = criarLinkCopiar();
+        let resultado = document.createElement('input');
+        resultado.type = 'text';
+        resultado.id = 'resultado';
+        resultado.className = 'form-control mb-2';
+        resultado.setAttribute('readonly', 'readonly');
+        resultado.value = cep;
+        document.querySelector('#resultadoCEP').appendChild(resultado);
+        document.querySelector('#botaoCopia').appendChild(btnCopiar);
 
+        document.querySelector('#copiar').addEventListener('click', function () {
+           resultado.select();
+           document.execCommand('copy');
+        });
+    }
+    
+    function finalizaConsulta() {
+        document.querySelector('#btn').setAttribute("disabled", "disabled");
+        document.querySelector('#logradouro').setAttribute("disabled", "disabled");
+        document.querySelector('#uf').setAttribute("disabled", "disabled");
+        document.querySelector('#cidade').setAttribute("disabled", "disabled");
+        let btnNovaConsulta = document.createElement('button');
+        btnNovaConsulta.id = 'btnnovaconsulta';
+        btnNovaConsulta.className = 'btn btn-danger btn-lg btn-block mt-2';
+        btnNovaConsulta.innerHTML = 'Nova Consulta';
+        document.querySelector('#containerBotoes').appendChild(btnNovaConsulta);
+
+        btnNovaConsulta.addEventListener('click', function () {
+           document.location.reload(); 
+        });
+    }
+
+    function criarLinkCopiar() {
+        let btnCopiar = document.createElement('a');
+        btnCopiar.id = 'copiar';
+        btnCopiar.innerHTML = 'Copiar';
+        btnCopiar.className = 'btn btn-success text-white text-center';
+        return btnCopiar;
+    }
 })
+
+// resolver problema quando retorna array vazio na consulta
