@@ -74,7 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.querySelector('#containerDinamico').appendChild(msgSelect);
                     document.querySelector('#containerDinamico').appendChild(novoSelect);
                     jsonEndereco.forEach(endereco => {
-                        let opt = endereco.logradouro + " " + endereco.complemento;
+                        bairro = endereco.bairro.length > 0 ? ", " + endereco.bairro : "";
+                        let opt = endereco.logradouro + " " + endereco.complemento + bairro;
                         option = new Option(opt, endereco.cep);
                         novoSelect.options[novoSelect.options.length] = option;
                     });
@@ -160,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('#cidade').setAttribute("disabled", "disabled");
         let btnNovaConsulta = document.createElement('button');
         btnNovaConsulta.id = 'btnnovaconsulta';
-        btnNovaConsulta.className = 'btn btn-danger btn-lg btn-block mt-2';
+        btnNovaConsulta.className = 'btn btn-danger btn-lg btn-block mt-2 mb-2';
         btnNovaConsulta.innerHTML = 'Nova Consulta';
         document.querySelector('#containerBotoes').appendChild(btnNovaConsulta);
 
