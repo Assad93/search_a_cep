@@ -73,9 +73,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     novoSelect.className = 'form-control mb-2 custom-select';
                     document.querySelector('#containerDinamico').appendChild(msgSelect);
                     document.querySelector('#containerDinamico').appendChild(novoSelect);
+                    primeiraOption = new Option("Selecione um endereço...", '#');
+                    novoSelect.options[novoSelect.options.length] = primeiraOption;
                     jsonEndereco.forEach(endereco => {
                         bairro = endereco.bairro.length > 0 ? ", " + endereco.bairro : "";
-                        let opt = endereco.logradouro + " " + endereco.complemento + bairro;
+                        let opt = endereco.cep + " - " + endereco.logradouro + " " + endereco.complemento + bairro;
                         option = new Option(opt, endereco.cep);
                         novoSelect.options[novoSelect.options.length] = option;
                     });
