@@ -33,11 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let logradouro = document.querySelector('#logradouro').value;
         document.querySelector('#mensagem').innerHTML = "";
         if (ufValue == '#' || logradouro == '' || cidade == '#') {
-            let alert = document.createElement('div');
-            alert.className = 'alert alert-danger';
-            alert.role = 'alert';
-            alert.innerHTML = 'Preencha os três campos para realizar a pesquisa! :-)';
-            document.querySelector('#mensagem').appendChild(alert);
+            criarAlertErro('Preencha os três campos para realizar a pesquisa! :-)');
         } else {
             ufList.forEach(uf => {
                 if(uf.id == ufValue) sigla = uf.sigla; 
@@ -49,11 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function buscaCEP(uf,cidade,logradouro) {
         if (logradouro.length < 3) {
-            let msgWarning = document.createElement('div');
-                msgWarning.className = 'bg-warning pt-2 text-white d-flex justify-content-center mb-2';
-                msgWarning.innerHTML = '<h5> Para consultar o CEP insira 3 ou mais caracteres!</h5>';
-                document.querySelector('#containerDinamico').appendChild(msgWarning);
-                finalizaConsulta();
+            criarAlertErro('Para consultar o CEP insira 3 ou mais caracteres!');
+            finalizaConsulta();
         }
         let url = "https://viacep.com.br/ws/" + uf + "/"+ cidade +"/" + logradouro + "/json/"; 
         let xmlHttp = new XMLHttpRequest();
@@ -90,10 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 }else {
                     if(jsonEndereco.length == 0) {
-                        let msgWarning = document.createElement('div');
-                        msgWarning.className = 'bg-warning pt-2 text-white d-flex justify-content-center mb-2';
-                        msgWarning.innerHTML = '<h5> CEP não encontrado, verifique se você digitou um endereço válido!</h5>';
-                        document.querySelector('#containerDinamico').appendChild(msgWarning);
+                        criarAlertErro('CEP não encontrado, verifique se você digitou um endereço válido!');
                         finalizaConsulta();
                     }else {
                         exibirCep(jsonEndereco[0].cep);
@@ -132,8 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         municipiosSelect.options[municipiosSelect.options.length] = option;
                     });
                 } 
-                
-                                   
             }
         }
         xmlHttp.send();
@@ -157,10 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function finalizaConsulta() {
-        document.querySelector('#btn').setAttribute("disabled", "disabled");
-        document.querySelector('#logradouro').setAttribute("disabled", "disabled");
-        document.querySelector('#uf').setAttribute("disabled", "disabled");
-        document.querySelector('#cidade').setAttribute("disabled", "disabled");
+        desabilitarEntradas();
         let btnNovaConsulta = document.createElement('button');
         btnNovaConsulta.id = 'btnnovaconsulta';
         btnNovaConsulta.className = 'btn btn-danger btn-lg btn-block mt-2 mb-2';
@@ -179,6 +164,24 @@ document.addEventListener('DOMContentLoaded', function() {
         btnCopiar.className = 'btn btn-success text-white text-center';
         return btnCopiar;
     }
-})
 
-// resolver problema quando retorna array vazio na consulta
+    function criarAlertErro(msg) {
+        let alert = document.createElement('div');
+        alert.className = 'alert alert-danger';
+        alert.role = 'alert';
+        alert.innerHTML = msg;
+        document.querySelector('#mensagem').appendChild(alert);
+    }
+
+    //consertar as entradas
+    function desabilitarEntradas() {
+        document.querySelector('#btn').setAttribute("disabled", "disabled");
+
+        let inputLogradouro = document.querySelector('#logradouro');
+        //inputLogradouro.className ="form-control bg-secondary text-white";
+        inputLogradouro.setAttribute("disabled", "disabled");
+        
+        document.querySelector('#uf').setAttribute("disabled", "disabled");
+        document.querySelector('#cidade').setAttribute("disabled", "disabled");        
+    }
+})
