@@ -51,8 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let url = "https://viacep.com.br/ws/" + uf + "/"+ cidade +"/" + logradouro + "/json/"; 
         let xmlHttp = new XMLHttpRequest();
         xmlHttp.open('GET', url);
-        console.log(url);
-        console.log(xmlHttp);
         xmlHttp.onreadystatechange = () => {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 let txtEndereco = xmlHttp.responseText;
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     novoSelect.options[novoSelect.options.length] = primeiraOption;
                     jsonEndereco.forEach(endereco => {
                         bairro = endereco.bairro.length > 0 ? ", " + endereco.bairro : "";
-                        let opt = endereco.cep + " - " + endereco.logradouro + " " + endereco.complemento + bairro;
+                        let opt = endereco.cep + " || " + endereco.logradouro + " " + endereco.complemento + bairro;
                         option = new Option(opt, endereco.cep);
                         novoSelect.options[novoSelect.options.length] = option;
                     });
@@ -86,8 +84,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         criarAlertErro('CEP não encontrado, verifique se você digitou um endereço válido!');
                         finalizaConsulta();
                     }else {
-                        exibirCep(jsonEndereco[0].cep);
-                        finalizaConsulta();
+                        if (jsonEndereco[0].logradouro == "") {
+                            let msgWarning = document.createElement('div');
+                            msgWarning.className = 'alert alert-warning';
+                            msgWarning.role = 'alert';
+                            msgWarning.innerHTML = 'Atenção! Esta cidade possui somente um CEP para todos os endereços.';
+                            document.querySelector('#mensagem').appendChild(msgWarning);
+                            exibirCep(jsonEndereco[0].cep);
+                            finalizaConsulta();
+                        } else {
+                            exibirCep(jsonEndereco[0].cep);
+                            finalizaConsulta();
+                        }
                     }
                     
                 }
@@ -106,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 let txtMunicipios = xmlHttp.responseText;
                 let jsonMunicipios = JSON.parse(txtMunicipios);
-                console.log(jsonMunicipios);
                 let municipiosList = jsonMunicipios;
                 let municipiosSelect = document.querySelector('#cidade');
         
@@ -173,15 +180,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('#mensagem').appendChild(alert);
     }
 
-    //consertar as entradas
+    
     function desabilitarEntradas() {
         document.querySelector('#btn').setAttribute("disabled", "disabled");
 
-        let inputLogradouro = document.querySelector('#logradouro');
-        //inputLogradouro.className ="form-control bg-secondary text-white";
-        inputLogradouro.setAttribute("disabled", "disabled");
+        document.querySelector('#logradouro').setAttribute("disabled", "disabled");
         
         document.querySelector('#uf').setAttribute("disabled", "disabled");
-        document.querySelector('#cidade').setAttribute("disabled", "disabled");        
+        
+        document.querySelector('#cidade').setAttribute("disabled", "disabled");
+        
     }
 })
